@@ -1,0 +1,17 @@
+[
+  {
+    "id": "rce-1",
+    "description": "Command Injection - wget/curl",
+    "pattern": "(?i)(wget|curl)\\s+https?:"
+  },
+  {
+    "id": "rce-2",
+    "description": "Command Injection - others",
+    "pattern":  "(?i)\\s(bash|sh|dash|zsh|cmd|powershell|eval|exec|system|shell_exec|spawn|passthru|popen|proc_open|os\\.system|subprocess|Runtime\\.getRuntime\\(\\)|ProcessBuilder|child_process)(\\s|\\s*[\\(:])"
+  },
+  {
+    "id": "rce-3",
+    "description": "Command Injection - php shell",
+    "pattern": "(?i)\\/[a-z]*shell\\.php\\b"
+  }
+]

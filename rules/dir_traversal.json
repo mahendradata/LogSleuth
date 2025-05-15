@@ -1,0 +1,7 @@
+[
+  {
+    "id": "dir-traversal-1",
+    "description": "Directory Traversal",
+    "pattern": "(?i)(?<!\\.)\\.{2}(?!\\.)[\\/\\\\]"
+  }
+]

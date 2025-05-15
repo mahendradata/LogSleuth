@@ -1,0 +1,7 @@
+[
+  {
+    "id": "xss-1",
+    "description": "XSS - script tag",
+    "pattern": "(?i)<script.*?>.*?</script>|javascript:|\\bon\\w+=|\\balert\\s*\\(|<img\\s+[^>]*src=\\s*\\\"?javascript:|<svg[^>]*on\\w+="
+  }
+]

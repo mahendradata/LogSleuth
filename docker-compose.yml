@@ -1,0 +1,8 @@
+services:
+  analyzer:
+    build: .
+    volumes:
+      - ./logs:/logs
+      - ./rules:/rules
+      - ./outputs:/outputs
+    command: /logs/sample_access.log /rules/default_rules.json /outputs/default_rules.log

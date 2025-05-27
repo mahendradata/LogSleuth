@@ -1,77 +1,57 @@
 [
   {
-    "id": "dir-traversal-1",
-    "description": "Directory Traversal",
-    "pattern": "(?i)(?<!\\.)\\.{2}(?!\\.)[\\/\\\\]"
-  },
-  {
-    "id": "rce-1",
-    "description": "Command Injection - wget/curl",
+    "id": "rce",
+    "description": "Command Injection - wget/curl used to download malicious payloads",
     "pattern": "(?i)(wget|curl)\\s+https?:"
   },
   {
-    "id": "rce-2",
-    "description": "Command Injection - others",
-    "pattern":  "(?i)\\s(bash|sh|dash|zsh|cmd|powershell|eval|exec|system|shell_exec|spawn|passthru|popen|proc_open|os\\.system|subprocess|Runtime\\.getRuntime\\(\\)|ProcessBuilder|child_process)(\\s|\\s*[\\(:])"
+    "id": "rce",
+    "description": "Command Injection - PHP shell execution function",
+    "pattern": "(?i)shell_exec"
   },
   {
-    "id": "rce-3",
-    "description": "Command Injection - php shell",
-    "pattern": "(?i)\\/[a-z]*shell\\.php\\b"
+    "id": "sqli",
+    "description": "SQL Injection - use of CAST, CHAR/CHR functions or nested SELECT",
+    "pattern": "(?i)CAST\\(|CHAR\\(|CHR\\(|\\(SELECT"
   },
   {
-    "id": "res-1",
-    "description": "Restricted - Hidden files",
-    "pattern": "(?i)\\/\\.(env|git|gitignore|svn|hg)\\b"
+    "id": "sqli",
+    "description": "SQL Injection - logic operators with SELECT (UNION, AND, OR)",
+    "pattern": "(?i)(UNION|AND|OR).*SELECT"
   },
   {
-    "id": "res-2",
-    "description": "Restricted - Hidden files",
-    "pattern": "(?i)\\/((config|wp-config|cmd|shell|c99|r57|wso|php-reverse-shell)\\.php)\\b"
+    "id": "bot",
+    "description": "Automated bot activity - access to robots.txt",
+    "pattern": "(?i)robots\\.txt"
   },
   {
-    "id": "sqli-1",
-    "description": "SQL Injection - COMMENT",
-    "pattern": "(?i)(--\\+?|\\#)(\\s|$)"
+    "id": "scanning",
+    "description": "Scanning - common WordPress admin and config paths",
+    "pattern": "(?i)wp-admin|wp-content|wp-config|wp-login|wp-includes|xmlrpc"
   },
   {
-    "id": "sqli-2",
-    "description": "SQL Injection - OR '1'='1'",
-    "pattern": "(?i)(\\s(or|and)\\s['\\\"]?[0-9]+['\\\"]?\\s*(=|!=|<>)['\\\"]?\\s*[0-9]+['\\\"]?)"
+    "id": "scanning",
+    "description": "Directory Traversal - use of '/../' patterns",
+    "pattern": "(?i)\\/\\.\\.\\/"
   },
   {
-    "id": "sqli-3",
-    "description": "SQL Injection - SELECT FROM",
-    "pattern": "(?i)\\bselect\\b(?:\\s|\\/\\*.*?\\*\\/|\\+)+.*?\\bfrom\\b"
+    "id": "scanning",
+    "description": "Scanning - hidden file or dotfile access attempt (excluding .well-known)",
+    "pattern": "(?i)\\/\\.(?!well-known)[^\\/\\s\\.]+"
   },
   {
-    "id": "sqli-4",
-    "description": "SQL Injection - UPDATE SET",
-    "pattern": "(?i)\\bupdate\\b(?:\\s|\\/\\*.*?\\*\\/|\\+)+.*?\\bset\\b"
+    "id": "scanning",
+    "description": "Scanning - access to common test/config/shell PHP files",
+    "pattern": "(?i)\\/(desktop\\.ini|phpinfo|info|test|config|cmd|setup|.*shell)\\.php"
   },
   {
-    "id": "sqli-5",
-    "description": "SQL Injection - UNION SELECT",
-    "pattern": "(?i)\\bunion\\b(?:\\s|\\/\\*.*?\\*\\/|\\+)+.*?\\bselect\\b"
+    "id": "scanning",
+    "description": "Scanning - access to backup files or database dumps",
+    "pattern": "(?i)backup\\.(zip|tar|gz)|db\\.sql"
   },
   {
-    "id": "sqli-6",
-    "description": "SQL Injection - Common Commands",
-    "pattern": "(?i)\\s(drop\\s+table|insert\\s+into|delete\\s+from|waitfor\\s+delay|outfile|exec)\\s"
-  },
-  {
-    "id": "sqli-7",
-    "description": "SQL Injection - Common Functions",
-    "pattern": "(?i)\\s(sleep|benchmark|if|char|chr|concat|load_file|convert|xp_cmdshell)\\s*\\("
-  },
-  {
-    "id": "sqli-8",
-    "description": "SQL Injection - Common Tables",
-    "pattern": "(?i)(information_schema|table_schema|performance_schema)"
-  },
-  {
-    "id": "xss-1",
-    "description": "XSS - script tag",
-    "pattern": "(?i)<script.*?>.*?</script>|javascript:|\\bon\\w+=|\\balert\\s*\\(|<img\\s+[^>]*src=\\s*\\\"?javascript:|<svg[^>]*on\\w+="
+    "id": "xss",
+    "description": "Cross-Site Scripting (XSS) - script tag injection",
+    "pattern": "(?i)<script.*?>.*?<\\/script>"
   }
 ]

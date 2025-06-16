@@ -29,20 +29,21 @@ def clean(text):
 
 def smart_decode(textori):
     """
-    Decode obfuscated or encoded text from URLs and headers.
+    Decode obfuscated or encoded text from URLs or headers using layered decoding.
 
-    Applies a layered decoding approach:
-      1. Percent-decodes the input (handles single and double encoding)
-      2. Interprets Python-style byte escape sequences (e.g., \\x41, \\u1234)
-      3. Attempts to base64-decode the last URL segment if it resembles base64
+    This function attempts multiple decoding techniques to normalize text that
+    may have been encoded or obfuscated. The steps include:
+    1. Percent-decoding (handles both single and double encoded inputs).
+    2. Interpreting Python-style byte escape sequences (e.g., \x41, \u1234).
+    3. Optionally attempting Base64 decoding of the last URL segment if it appears valid.
 
-    If base64 decoding is successful, appends a "-base64:..." string to the end.
+    If Base64 decoding is successful, it appends a decoded string as metadata to the result.
 
     Args:
-        textori (str): Original encoded text.
+        textori (str): The original encoded string.
 
     Returns:
-        str: Decoded text with potential base64 insight appended.
+        str: The decoded string, potentially with base64-derived insight appended.
     """
     try:
         # Step 1: Percent-decode (handle single and double encoding)
@@ -71,18 +72,18 @@ def decode_log_line(line):
     """
     Parse and decode a single NGINX access log line into structured components.
 
-    Uses a regex pattern to extract fields such as IP address, timestamp, HTTP method,
-    URL, status code, and headers. Fields are cleaned using `clean()`, and selected
-    fields are normalized with `smart_decode()` to reveal hidden or obfuscated content.
+    This function matches the input log line against a predefined NGINX regex format,
+    extracts relevant fields (IP, timestamp, method, URL, status, etc.), sanitizes
+    them using `clean()`, and decodes selected fields using `smart_decode()` to
+    uncover obfuscation or encoded payloads.
 
     Args:
-        line (str): A single raw log line from the access log.
+        line (str): A raw log line string from the access log.
 
     Returns:
         tuple:
-            - str: The reconstructed (cleaned and decoded) log line.
-            - dict: A dictionary of extracted fields, ready for analysis.
-                   Returns (None, None) if parsing fails.
+            - str: A reconstructed log line with cleaned and decoded fields.
+            - dict: A dictionary of structured fields, or (None, None) if the line cannot be parsed.
     """
     match = log_pattern.match(line)
     if not match:

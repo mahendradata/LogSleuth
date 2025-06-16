@@ -1,18 +1,22 @@
-## 🧾 Log Analyzer for NGINX (with Bot Filtering and Regex Rules)
+## 🧾 LogSleuth: NGINX Log Analyzer with Bot Filtering and Regex Detection
 
-This tool analyzes NGINX access logs to detect potentially malicious patterns using regex-based rules. It supports decoding obfuscated payloads and filtering out valid bots using reverse+forward DNS checks.
+LogSleuth is a Python-based tool to analyze NGINX access logs and detect suspicious patterns using customizable regex-based rules. It includes:
+
+* Decoding obfuscated payloads (e.g., URL-encoded, Base64).
+* Skipping verified bots through reverse and forward DNS validation.
+* Flexible rule configuration via JSON.
 
 ---
 
-### ✅ Usage (Command Line)
+### ✅ Command-Line Usage
 
-#### Run locally (Python)
+#### Run Locally with Python
 
 ```bash
 python -m app.main <access_log_file> <rules_file.json> <output_file.log>
 ```
 
-#### Example:
+#### Example
 
 ```bash
 python -m app.main logs/sample_access.log rules/default_rules.json outputs/detected.log
@@ -20,86 +24,92 @@ python -m app.main logs/sample_access.log rules/default_rules.json outputs/detec
 
 ---
 
-### 📥 Input
+### 📥 Input Format
 
-* **Access log file** (`logs/sample_access.log`):
-  Standard NGINX log format (combined).
+#### Access Log File
 
-* **Rules file** (`rules/default_rules.json`):
-  JSON array of rules, each containing:
+* Format: Standard NGINX **combined** log format.
 
-  ```json
-  {
-    "id": "xss-script-tag",
-    "description": "Detect <script> injection",
-    "pattern": "<script.*?>.*?</script>"
-  }
-  ```
+#### Rules File (JSON)
+
+Each rule must be an object containing:
+
+```json
+{
+  "id": "xss-script-tag",
+  "description": "Detect <script> injection",
+  "pattern": "<script.*?>.*?</script>"
+}
+```
+
+At runtime, each `pattern` will be compiled as a regular expression.
 
 ---
 
-### 📤 Output
+### 📤 Output Format
 
-* Lines matching a rule are written to the output file, e.g.:
-
-```
-15 xss-script-tag 192.168.1.1 - - [07/May/2025:12:01:52 +0700] "GET /index.php?q=<script>alert(1)</script> HTTP/1.1" 200 123 "-" "Mozilla" "-"
-```
-
-Each output line includes:
+Detected lines are written to the output file as:
 
 ```
 <line_number> <rule_id> <decoded_log_line>
 ```
 
+Example output:
+
+```
+15 xss-script-tag 192.168.1.1 - - [07/May/2025:12:01:52 +0700] "GET /index.php?q=<script>alert(1)</script> HTTP/1.1" 200 123 "-" "Mozilla" "-"
+```
+
 ---
 
-## 🐳 Docker Compatibility
+## 🐳 Docker Support
 
-This project is Dockerized for easy deployment and analysis across environments.
+Run the analyzer in a containerized environment with ease.
 
 ### 🔧 Build and Run
 
-#### 1. Build the Docker image:
+#### Step 1: Build the Docker image
 
 ```bash
 docker compose build
 ```
 
-#### 2. Run the analyzer:
+#### Step 2: Run the analyzer
 
 ```bash
 docker compose run analyzer
 ```
 
+---
+
 ### 📂 Volume Mappings
 
-The container uses volume mounts to access external log/rule/output files:
+The Docker container expects logs, rules, and outputs to be placed in mounted folders:
 
 ```yaml
 volumes:
-  - ./logs:/logs         # Put your input log files here
-  - ./rules:/rules       # Place your JSON rule files here
-  - ./outputs:/outputs   # Output files are written here
+  - ./logs:/logs         # Input log files
+  - ./rules:/rules       # Regex rules in JSON format
+  - ./outputs:/outputs   # Output files
 ```
 
-#### Example Command (from `docker-compose.yml`):
+#### Docker Compose Command Example
 
 ```yaml
-command: /logs/sample_access.log /rules/default_rules.json /outputs/default_rules.log
+command: /logs/sample_access.log /rules/default_rules.json /outputs/detected.log
 ```
 
-> You can override the command to analyze a different file:
+Override the default command with:
 
 ```bash
-docker-compose run analyzer /logs/another.log /rules/sql_rules.json /outputs/another_output.log
+docker compose run analyzer /logs/another.log /rules/sql_rules.json /outputs/result.log
 ```
 
 ---
 
 ### 📦 Requirements
 
-If you're running it without Docker, install dependencies:
+To run without Docker, install dependencies via:
 
 ```bash
 pip install -r requirements.txt

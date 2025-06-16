@@ -44,10 +44,11 @@ spoofed_bot_ips = pickle_load(SPOOFED_IP_FILE)
 
 def save_ip_caches():
     """
-    Save verified and spoofed bot IP sets to disk.
+    Persist IP address caches for verified and spoofed bots.
 
-    This function is registered to run at program exit (via `atexit`) to persist
-    cache changes and avoid redundant DNS lookups in future runs.
+    This function is registered with `atexit` and ensures that any updates
+    to `verified_bot_ips` and `spoofed_bot_ips` are saved to disk when the program exits.
+    This reduces redundant DNS lookups across executions.
     """
     with open(VERIFIED_IP_FILE, "wb") as f:
         pickle.dump(verified_bot_ips, f)
@@ -58,13 +59,13 @@ atexit.register(save_ip_caches)
 
 def reverse_dns(ip):
     """
-    Perform a reverse DNS lookup to resolve an IP to its hostname.
+    Perform a reverse DNS lookup for the given IP address.
 
     Args:
-        ip (str): The IP address to reverse-resolve.
+        ip (str): The IP address to resolve.
 
     Returns:
-        str or None: The resolved hostname, or None if resolution fails.
+        str or None: The resolved hostname, or None if the lookup fails.
     """
     try:
         return socket.gethostbyaddr(ip)[0]
@@ -73,7 +74,7 @@ def reverse_dns(ip):
 
 def forward_dns(hostname):
     """
-    Perform a forward DNS lookup to resolve a hostname to its IP address.
+    Resolve a hostname to its corresponding IP address using forward DNS.
 
     Args:
         hostname (str): The hostname to resolve.

@@ -8,28 +8,25 @@ from app.log_decoder import clean
 
 def main():
     """
-    Main entry point for the NGINX access log analyzer.
+    Main entry point for the LogSleuth NGINX access log analyzer.
 
-    This function:
-    1. Validates command-line arguments: expects a log file, rules file, and output file path.
-    2. Loads regex-based detection rules from a JSON file.
-    3. Processes the access log line-by-line:
-        - Skips unparsable lines
-        - Skips requests from verified bot IPs based on reverse and forward DNS validation
-        - Applies regex rules to the URL field of each request
-        - Writes matched lines (with line number and rule ID) to the output file
+    This function performs the following steps:
+    1. Validates the command-line arguments: expects a log file, a JSON rules file, and an output file path.
+    2. Loads detection rules (regex patterns with identifiers) from the provided rules file.
+    3. Processes the access log file line by line:
+        - Ignores unparsable lines.
+        - Skips requests from verified bots using reverse and forward DNS checks.
+        - Applies regex rules to the URL field of each valid request.
+        - Writes matched lines to the output file, including the line number and matching rule ID.
 
     Usage:
         python -m app.main <nginx_access_log> <regex_rules_file> <output_file>
 
-    Expected file formats:
-        - Log file: Standard NGINX combined log format
-        - Rules file: JSON array of objects with 'id' and 'pattern'
-        - Output file: Text file containing line number, rule ID, and decoded log entry
-
-    Output:
-        - Writes one line per detected match to the output file in the format:
-          <line_number> <rule_id> <decoded_log_line>
+    File format expectations:
+        - Log file: Standard NGINX combined access log format.
+        - Rules file: JSON array of objects, each with:
+            - 'id': A unique identifier string.
+            - 'pattern': A regular expression string.
     """
     if len(sys.argv) != 4:
         print("Usage: python -m app.main <nginx_access_log> <regex_rules_file> <output_file>")
@@ -57,23 +54,18 @@ def main():
             linedecoded, fields = decode_log_line(line)
             
             if not linedecoded:
-                # outfile.write(f"{lineno} unparseable {clean(line)}\n")
                 continue  # skip lines that couldn't be parsed
 
             ip = fields.get('ip', '-')
             ua = fields.get('user_agent', '-')
             if is_valid_bot(ip, ua):
-                # outfile.write(f"{lineno} valid-bot {linedecoded}\n")
                 continue  # skip processing of known good bots
 
             attack = analyze_log_fields(fields, rules)
             if attack:
                 outfile.write(f"{lineno} {attack} {linedecoded}\n")
-            #     continue
-            
-            # outfile.write(f"{lineno} benign {linedecoded}\n")
 
-    print(f"\n[✓] Done. Matched lines written to: {output_path}")
+    print(f"\n[✅] Done. Matched lines written to: {output_path}")
 
 if __name__ == "__main__":
     main()
